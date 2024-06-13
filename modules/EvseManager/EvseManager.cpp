@@ -731,10 +731,12 @@ void EvseManager::ready() {
         }
     });
 
+    // Cancel reservations if charger is faulted
+    error_handling->signal_error.connect([this](bool prevents_charging) { cancel_reservation(true); });
+
     charger->signal_simple_event.connect([this](types::evse_manager::SessionEventEnum s) {
-        // Cancel reservations if charger is disabled or faulted
-        if (s == types::evse_manager::SessionEventEnum::Disabled or
-            s == types::evse_manager::SessionEventEnum::PermanentFault) {
+        // Cancel reservations if charger is disabled
+        if (s == types::evse_manager::SessionEventEnum::Disabled) {
             cancel_reservation(true);
         }
         if (s == types::evse_manager::SessionEventEnum::SessionFinished) {
@@ -918,7 +920,8 @@ void EvseManager::ready_to_start_charging() {
     }
 
     this->p_evse->publish_ready(true);
-    EVLOG_info << fmt::format(fmt::emphasis::bold | fg(fmt::terminal_color::green), "🌀🌀🌀 Ready to start charging 🌀🌀🌀");
+    EVLOG_info << fmt::format(fmt::emphasis::bold | fg(fmt::terminal_color::green),
+                              "🌀🌀🌀 Ready to start charging 🌀🌀🌀");
 }
 
 types::powermeter::Powermeter EvseManager::get_latest_powermeter_data_billing() {
