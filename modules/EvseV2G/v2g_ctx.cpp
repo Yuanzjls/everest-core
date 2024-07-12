@@ -424,26 +424,26 @@ void publish_dc_ev_maximum_limits(struct v2g_context* ctx, const float& v2g_dc_e
                                 const unsigned int& v2g_dc_ev_max_power_limit_is_used,
                                 const float& v2g_dc_ev_max_voltage_limit,
                                 const unsigned int& v2g_dc_ev_max_voltage_limit_is_used) {
-    types::iso15118_charger::DC_EVMaximumLimits dc_ev_maximum_limits;
+    types::iso15118_charger::DcEvMaximumLimits dc_ev_maximum_limits;
     bool publish_message = false;
 
     if (v2g_dc_ev_max_current_limit_is_used == (unsigned int)1) {
-        dc_ev_maximum_limits.DC_EVMaximumCurrentLimit = v2g_dc_ev_max_current_limit;
-        if (ctx->ev_v2g_data.ev_maximum_current_limit != dc_ev_maximum_limits.DC_EVMaximumCurrentLimit.value()) {
+        dc_ev_maximum_limits.dc_ev_maximum_current_limit = v2g_dc_ev_max_current_limit;
+        if (ctx->ev_v2g_data.ev_maximum_current_limit != dc_ev_maximum_limits.dc_ev_maximum_current_limit.value()) {
             ctx->ev_v2g_data.ev_maximum_current_limit = v2g_dc_ev_max_current_limit;
             publish_message = true;
         }
     }
     if (v2g_dc_ev_max_power_limit_is_used == (unsigned int)1) {
-        dc_ev_maximum_limits.DC_EVMaximumPowerLimit = v2g_dc_ev_max_power_limit;
+        dc_ev_maximum_limits.dc_ev_maximum_power_limit = v2g_dc_ev_max_power_limit;
         if (ctx->ev_v2g_data.ev_maximum_power_limit != v2g_dc_ev_max_power_limit) {
             ctx->ev_v2g_data.ev_maximum_power_limit = v2g_dc_ev_max_power_limit;
             publish_message = true;
         }
     }
     if (v2g_dc_ev_max_voltage_limit_is_used == (unsigned int)1) {
-        dc_ev_maximum_limits.DC_EVMaximumVoltageLimit = v2g_dc_ev_max_voltage_limit;
-        if (ctx->ev_v2g_data.ev_maximum_voltage_limit != dc_ev_maximum_limits.DC_EVMaximumVoltageLimit.value()) {
+        dc_ev_maximum_limits.dc_ev_maximum_voltage_limit = v2g_dc_ev_max_voltage_limit;
+        if (ctx->ev_v2g_data.ev_maximum_voltage_limit != dc_ev_maximum_limits.dc_ev_maximum_voltage_limit.value()) {
             ctx->ev_v2g_data.ev_maximum_voltage_limit = v2g_dc_ev_max_voltage_limit;
             publish_message = true;
         }
@@ -458,9 +458,9 @@ void publish_dc_ev_target_voltage_current(struct v2g_context* ctx, const float& 
                                        const float& v2g_dc_ev_target_current) {
     if ((ctx->ev_v2g_data.v2g_target_voltage != v2g_dc_ev_target_voltage) ||
         (ctx->ev_v2g_data.v2g_target_current != v2g_dc_ev_target_current)) {
-        types::iso15118_charger::DC_EVTargetValues DC_EVTargetValues;
-        DC_EVTargetValues.DC_EVTargetVoltage = v2g_dc_ev_target_voltage;
-        DC_EVTargetValues.DC_EVTargetCurrent = v2g_dc_ev_target_current;
+        types::iso15118_charger::DcEvTargetValues DC_EVTargetValues;
+        DC_EVTargetValues.dc_ev_target_voltage = v2g_dc_ev_target_voltage;
+        DC_EVTargetValues.dc_ev_target_current = v2g_dc_ev_target_current;
 
         ctx->ev_v2g_data.v2g_target_voltage = v2g_dc_ev_target_voltage;
         ctx->ev_v2g_data.v2g_target_current = v2g_dc_ev_target_current;
@@ -473,7 +473,7 @@ void publish_dc_ev_remaining_time(struct v2g_context* ctx, const float& v2g_dc_e
                                 const unsigned int& v2g_dc_ev_remaining_time_to_full_soc_is_used,
                                 const float& v2g_dc_ev_remaining_time_to_bulk_soc,
                                 const unsigned int& v2g_dc_ev_remaining_time_to_bulk_soc_is_used) {
-    types::iso15118_charger::DC_EVRemainingTime dc_ev_remaining_time;
+    types::iso15118_charger::DcEvRemainingTime dc_ev_remaining_time;
     const char* format = "%Y-%m-%dT%H:%M:%SZ";
     char buffer[100];
     std::time_t time_now_in_sec = time(NULL);
@@ -483,7 +483,7 @@ void publish_dc_ev_remaining_time(struct v2g_context* ctx, const float& v2g_dc_e
         if (ctx->ev_v2g_data.remaining_time_to_full_soc != v2g_dc_ev_remaining_time_to_full_soc) {
             std::time_t time_to_full_soc = time_now_in_sec + v2g_dc_ev_remaining_time_to_full_soc;
             std::strftime(buffer, sizeof(buffer), format, std::gmtime(&time_to_full_soc));
-            dc_ev_remaining_time.EV_RemainingTimeToFullSoC = std::string(buffer);
+            dc_ev_remaining_time.ev_remaining_time_to_full_soc = std::string(buffer);
             ctx->ev_v2g_data.remaining_time_to_full_soc = v2g_dc_ev_remaining_time_to_full_soc;
             publish_message = true;
         }
@@ -492,7 +492,7 @@ void publish_dc_ev_remaining_time(struct v2g_context* ctx, const float& v2g_dc_e
         if (ctx->ev_v2g_data.remaining_time_to_bulk_soc != v2g_dc_ev_remaining_time_to_bulk_soc) {
             std::time_t time_to_bulk_soc = time_now_in_sec + v2g_dc_ev_remaining_time_to_bulk_soc;
             std::strftime(buffer, sizeof(buffer), format, std::gmtime(&time_to_bulk_soc));
-            dc_ev_remaining_time.EV_RemainingTimeToBulkSoC = std::string(buffer);
+            dc_ev_remaining_time.ev_remaining_time_to_full_bulk_soc = std::string(buffer);
             ctx->ev_v2g_data.remaining_time_to_bulk_soc = v2g_dc_ev_remaining_time_to_bulk_soc;
             publish_message = true;
         }

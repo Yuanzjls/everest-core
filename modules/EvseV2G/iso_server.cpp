@@ -210,7 +210,7 @@ static void check_iso2_charging_profile_values(iso2_PowerDeliveryReqType* req, i
     }
 }
 
-static void publish_DC_EVStatusType(struct v2g_context* ctx, const struct iso2_DC_EVStatusType& iso2_ev_status) {
+static void publish_DcEvStatus(struct v2g_context* ctx, const struct iso2_DC_EVStatusType& iso2_ev_status) {
     if ((ctx->ev_v2g_data.iso2_dc_ev_status.EVErrorCode != iso2_ev_status.EVErrorCode) ||
         (ctx->ev_v2g_data.iso2_dc_ev_status.EVReady != iso2_ev_status.EVReady) ||
         (ctx->ev_v2g_data.iso2_dc_ev_status.EVRESSSOC != iso2_ev_status.EVRESSSOC)) {
@@ -218,7 +218,7 @@ static void publish_DC_EVStatusType(struct v2g_context* ctx, const struct iso2_D
         ctx->ev_v2g_data.iso2_dc_ev_status.EVReady = iso2_ev_status.EVReady;
         ctx->ev_v2g_data.iso2_dc_ev_status.EVRESSSOC = iso2_ev_status.EVRESSSOC;
 
-        types::iso15118_charger::DC_EVStatusType ev_status;
+        types::iso15118_charger::DcEvStatus ev_status;
         ev_status.dc_ev_error_code = static_cast<types::iso15118_charger::DcEvErrorCode>(iso2_ev_status.EVErrorCode);
         ev_status.dc_ev_ready = iso2_ev_status.EVReady;
         ev_status.dc_ev_ress_soc = static_cast<float>(iso2_ev_status.EVRESSSOC);
@@ -344,7 +344,7 @@ static void publish_iso_charge_parameter_discovery_req(
         publish_dc_ev_maximum_limits(ctx, evMaximumCurrentLimit, (unsigned int)1, evMaximumPowerLimit,
                                    v2g_charge_parameter_discovery_req->DC_EVChargeParameter.EVMaximumPowerLimit_isUsed,
                                    evMaximumVoltageLimit, (unsigned int)1);
-        publish_DC_EVStatusType(ctx, v2g_charge_parameter_discovery_req->DC_EVChargeParameter.DC_EVStatus);
+        publish_DcEvStatus(ctx, v2g_charge_parameter_discovery_req->DC_EVChargeParameter.DC_EVStatus);
     }
 }
 
@@ -359,7 +359,7 @@ static void publish_iso_pre_charge_req(struct v2g_context* ctx,
         ctx,
         calc_physical_value(v2g_precharge_req->EVTargetVoltage.Value, v2g_precharge_req->EVTargetVoltage.Multiplier),
         calc_physical_value(v2g_precharge_req->EVTargetCurrent.Value, v2g_precharge_req->EVTargetCurrent.Multiplier));
-    publish_DC_EVStatusType(ctx, v2g_precharge_req->DC_EVStatus);
+    publish_DcEvStatus(ctx, v2g_precharge_req->DC_EVStatus);
 }
 
 /*!
@@ -376,7 +376,7 @@ static void publish_iso_power_delivery_req(struct v2g_context* ctx,
             ctx->p_charger->publish_dc_bulk_charging_complete(
                 v2g_power_delivery_req->DC_EVPowerDeliveryParameter.BulkChargingComplete);
         }
-        publish_DC_EVStatusType(ctx, v2g_power_delivery_req->DC_EVPowerDeliveryParameter.DC_EVStatus);
+        publish_DcEvStatus(ctx, v2g_power_delivery_req->DC_EVPowerDeliveryParameter.DC_EVStatus);
     }
 }
 
@@ -396,7 +396,7 @@ static void publish_iso_current_demand_req(struct v2g_context* ctx,
         ctx->ev_v2g_data.charging_complete = v2g_current_demand_req->ChargingComplete;
     }
 
-    publish_DC_EVStatusType(ctx, v2g_current_demand_req->DC_EVStatus);
+    publish_DcEvStatus(ctx, v2g_current_demand_req->DC_EVStatus);
 
     publish_dc_ev_target_voltage_current(ctx,
                                       calc_physical_value(v2g_current_demand_req->EVTargetVoltage.Value,
@@ -441,7 +441,7 @@ static void
 publish_iso_welding_detection_req(struct v2g_context* ctx,
                                   struct iso2_WeldingDetectionReqType const* const v2g_welding_detection_req) {
     // TODO: V2G values that can be published: EVErrorCode, EVReady, EVRESSSOC
-    publish_DC_EVStatusType(ctx, v2g_welding_detection_req->DC_EVStatus);
+    publish_DcEvStatus(ctx, v2g_welding_detection_req->DC_EVStatus);
 }
 
 /*!
@@ -456,7 +456,7 @@ static bool publish_iso_certificate_installation_exi_req(struct v2g_context* ctx
     bool rv = true;
     unsigned char* base64Buffer = NULL;
     size_t olen;
-    types::iso15118_charger::Request_Exi_Stream_Schema certificate_request;
+    types::iso15118_charger::RequestExiStreamSchema certificate_request;
 
 #ifdef EVEREST_MBED_TLS
     /* Parse contract leaf certificate */
@@ -476,21 +476,21 @@ static bool publish_iso_certificate_installation_exi_req(struct v2g_context* ctx
         dlog(DLOG_LEVEL_ERROR, "Unable to encode contract leaf certificate");
         goto exit;
     }
-    certificate_request.exiRequest = std::string(reinterpret_cast<const char*>(base64Buffer), olen);
+    certificate_request.exi_request = std::string(reinterpret_cast<const char*>(base64Buffer), olen);
 #else
-    certificate_request.exiRequest = openssl::base64_encode(AExiBuffer, AExiBufferSize);
-    if (certificate_request.exiRequest.size() > MQTT_MAX_PAYLOAD_SIZE) {
+    certificate_request.exi_request = openssl::base64_encode(AExiBuffer, AExiBufferSize);
+    if (certificate_request.exi_request.size() > MQTT_MAX_PAYLOAD_SIZE) {
         dlog(DLOG_LEVEL_ERROR, "Mqtt payload size exceeded!");
         return false;
     }
-    if (certificate_request.exiRequest.size() == 0) {
+    if (certificate_request.exi_request.size() == 0) {
         dlog(DLOG_LEVEL_ERROR, "Unable to encode contract leaf certificate");
         return false;
     }
 #endif // EVEREST_MBED_TLS
 
-    certificate_request.iso15118SchemaVersion = ISO_15118_2013_MSG_DEF;
-    certificate_request.certificateAction = types::iso15118_charger::CertificateActionEnum::Install;
+    certificate_request.iso15118_schema_version = ISO_15118_2013_MSG_DEF;
+    certificate_request.certificate_action = types::iso15118_charger::CertificateActionEnum::Install;
     ctx->p_charger->publish_certificate_request(certificate_request);
 
 exit:
@@ -1702,7 +1702,7 @@ static enum v2g_event handle_iso_cable_check(struct v2g_connection* conn) {
     enum v2g_event next_event = V2G_EVENT_NO_EVENT;
 
     /* At first, publish the received EV request message to the MQTT interface */
-    publish_DC_EVStatusType(conn->ctx, req->DC_EVStatus);
+    publish_DcEvStatus(conn->ctx, req->DC_EVStatus);
 
     // TODO: For DC charging wait for CP state C or D , before transmitting of the response ([V2G2-917], [V2G2-918]). CP
     // state is checked by other module

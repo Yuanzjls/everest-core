@@ -111,7 +111,7 @@ void publish_dc_ev_maximum_limits(struct v2g_context* ctx, const float& v2g_dc_e
                                 const unsigned int& v2g_dc_ev_max_voltage_limit_is_used);
 
 /*!
- * \brief publish_dc_ev_target_voltage_current This function publishes the DC_EVTargetValues
+ * \brief publish_dc_ev_target_voltage_current This function publishes the DcEvTargetValues
  * \param ctx  is a pointer of type \c v2g_context
  * \param v2g_dc_ev_target_voltage is the EV target voltage
  * \param v2g_dc_ev_target_current is the EV target current

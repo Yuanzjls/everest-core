@@ -120,11 +120,11 @@ static v2g_event din_validate_response_code(din_responseCodeType* const din_resp
 }
 
 /*!
- * \brief publish_DIN_DC_EVStatusType This function is a helper function to publish EVStatusType.
+ * \brief publish_DIN_DcEvStatus This function is a helper function to publish EVStatusType.
  * \param ctx is a pointer to the V2G context.
  * \param din_ev_status the structure the holds the EV Status elements.
  */
-static void publish_DIN_DC_EVStatusType(struct v2g_context* ctx, const struct din_DC_EVStatusType& din_ev_status) {
+static void publish_DIN_DcEvStatus(struct v2g_context* ctx, const struct din_DC_EVStatusType& din_ev_status) {
     if ((ctx->ev_v2g_data.din_dc_ev_status.EVErrorCode != din_ev_status.EVErrorCode) ||
         (ctx->ev_v2g_data.din_dc_ev_status.EVReady != din_ev_status.EVReady) ||
         (ctx->ev_v2g_data.din_dc_ev_status.EVRESSSOC != din_ev_status.EVRESSSOC)) {
@@ -132,7 +132,7 @@ static void publish_DIN_DC_EVStatusType(struct v2g_context* ctx, const struct di
         ctx->ev_v2g_data.din_dc_ev_status.EVReady = din_ev_status.EVReady;
         ctx->ev_v2g_data.din_dc_ev_status.EVRESSSOC = din_ev_status.EVRESSSOC;
 
-        types::iso15118_charger::DC_EVStatusType ev_status;
+        types::iso15118_charger::DcEvStatus ev_status;
         ev_status.dc_ev_error_code = static_cast<types::iso15118_charger::DcEvErrorCode>(din_ev_status.EVErrorCode);
         ev_status.dc_ev_ready = din_ev_status.EVReady;
         ev_status.dc_ev_ress_soc = static_cast<float>(din_ev_status.EVRESSSOC);
@@ -208,7 +208,7 @@ static void publish_din_charge_parameter_discovery_req(
         publish_dc_ev_maximum_limits(ctx, evMaximumCurrentLimit, (unsigned int)1, evMaximumPowerLimit,
                                    v2g_charge_parameter_discovery_req->DC_EVChargeParameter.EVMaximumPowerLimit_isUsed,
                                    evMaximumVoltageLimit, (unsigned int)1);
-        publish_DIN_DC_EVStatusType(ctx, v2g_charge_parameter_discovery_req->DC_EVChargeParameter.DC_EVStatus);
+        publish_DIN_DcEvStatus(ctx, v2g_charge_parameter_discovery_req->DC_EVChargeParameter.DC_EVStatus);
     }
 }
 
@@ -226,7 +226,7 @@ static void publish_din_power_delivery_req(struct v2g_context* ctx,
             ctx->p_charger->publish_dc_bulk_charging_complete(
                 v2g_power_delivery_req->DC_EVPowerDeliveryParameter.BulkChargingComplete);
         }
-        publish_DIN_DC_EVStatusType(ctx, v2g_power_delivery_req->DC_EVPowerDeliveryParameter.DC_EVStatus);
+        publish_DIN_DcEvStatus(ctx, v2g_power_delivery_req->DC_EVPowerDeliveryParameter.DC_EVStatus);
     }
 }
 
@@ -241,7 +241,7 @@ static void publish_din_precharge_req(struct v2g_context* ctx,
         ctx,
         calc_physical_value(v2g_precharge_req->EVTargetVoltage.Value, v2g_precharge_req->EVTargetVoltage.Multiplier),
         calc_physical_value(v2g_precharge_req->EVTargetCurrent.Value, v2g_precharge_req->EVTargetCurrent.Multiplier));
-    publish_DIN_DC_EVStatusType(ctx, v2g_precharge_req->DC_EVStatus);
+    publish_DIN_DcEvStatus(ctx, v2g_precharge_req->DC_EVStatus);
 }
 
 /*!
@@ -260,7 +260,7 @@ static void publish_din_current_demand_req(struct v2g_context* ctx,
         ctx->ev_v2g_data.charging_complete = v2g_current_demand_req->ChargingComplete;
     }
 
-    publish_DIN_DC_EVStatusType(ctx, v2g_current_demand_req->DC_EVStatus);
+    publish_DIN_DcEvStatus(ctx, v2g_current_demand_req->DC_EVStatus);
 
     publish_dc_ev_target_voltage_current(ctx,
                                       calc_physical_value(v2g_current_demand_req->EVTargetVoltage.Value,
@@ -713,7 +713,7 @@ static enum v2g_event handle_din_cable_check(struct v2g_connection* conn) {
     enum v2g_event nextEvent = V2G_EVENT_NO_EVENT;
 
     /* At first, publish the received EV request message to the MQTT interface */
-    publish_DIN_DC_EVStatusType(conn->ctx, req->DC_EVStatus);
+    publish_DIN_DcEvStatus(conn->ctx, req->DC_EVStatus);
 
     // TODO: Wait for CP state C [V2G-DC-547]
 
@@ -868,7 +868,7 @@ static enum v2g_event handle_din_welding_detection(struct v2g_connection* conn) 
     enum v2g_event nextEvent = V2G_EVENT_NO_EVENT;
 
     /* At first, publish the received EV request message to the MQTT interface */
-    publish_DIN_DC_EVStatusType(conn->ctx, req->DC_EVStatus);
+    publish_DIN_DcEvStatus(conn->ctx, req->DC_EVStatus);
 
     /* TODO: Waiting for CP-State B [V2G-DC-556]. */
 
