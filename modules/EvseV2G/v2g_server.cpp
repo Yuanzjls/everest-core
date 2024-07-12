@@ -145,7 +145,7 @@ static void publish_var_V2G_Message(v2g_connection* conn, bool is_req) {
     v2gMessage.V2G_Message_EXI_Base64 = EXI_Base64;
     v2gMessage.V2G_Message_ID = get_V2G_Message_ID(conn->ctx->current_v2g_msg, conn->ctx->selected_protocol, is_req);
     v2gMessage.V2G_Message_EXI_Hex = msg_as_hex_string;
-    conn->ctx->p_charger->publish_V2G_Messages(v2gMessage);
+    conn->ctx->p_charger->publish_v2g_messages(v2gMessage);
 }
 
 /*!
@@ -315,7 +315,7 @@ static enum v2g_event v2g_handle_apphandshake(struct v2g_connection* conn) {
     }
 
     if (conn->ctx->debugMode == true) {
-        conn->ctx->p_charger->publish_EV_AppProtocol(appProtocolArray);
+        conn->ctx->p_charger->publish_ev_app_protocol(appProtocolArray);
         /* form the content of V2G_Message type and publish the request*/
         publish_var_V2G_Message(conn, true);
     }
@@ -341,7 +341,7 @@ static enum v2g_event v2g_handle_apphandshake(struct v2g_connection* conn) {
     }
 
     if (conn->ctx->debugMode == true) {
-        conn->ctx->p_charger->publish_Selected_Protocol(selected_protocol_str);
+        conn->ctx->p_charger->publish_selected_protocol(selected_protocol_str);
     }
 
     if (conn->ctx->is_connection_terminated == true) {

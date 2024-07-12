@@ -25,7 +25,7 @@ types:
       - Warning
       - Fault
       - No_IMD
-  DC_EVErrorCode:
+  DcEvErrorCode:
     description: Indicates the DC EV internal status
     type: string
     enum:
@@ -217,18 +217,18 @@ types:
     type: object
     additionalProperties: false
     required:
-      - DC_EVReady
-      - DC_EVErrorCode
-      - DC_EVRESSSOC
+      - dc_ev_ready
+      - dc_ev_error_code
+      - dc_ev_ress_soc
     properties:
-      DC_EVReady:
+      dc_ev_ready:
         description: If set to TRUE, the EV is ready to charge
         type: boolean
-      DC_EVErrorCode:
+      dc_ev_error_code:
         description: Indicates the EV internal status
         type: string
-        $ref: /iso15118_charger#/DC_EVErrorCode
-      DC_EVRESSSOC:
+        $ref: /iso15118_charger#/DcEvErrorCode
+      dc_ev_ress_soc:
         description: State of charge of the EVs battery (RESS)
         type: number
         minimum: 0
