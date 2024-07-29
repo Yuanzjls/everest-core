@@ -1007,6 +1007,7 @@ enum v2g_event din_handle_request(v2g_connection* conn) {
         dlog(DLOG_LEVEL_TRACE, "Handling PreChargeReq");
         conn->ctx->current_v2g_msg = V2G_PRE_CHARGE_MSG;
         if (conn->ctx->last_v2g_msg == V2G_CABLE_CHECK_MSG) {
+            conn->ctx->p_charger->publish_Start_PreCharge(nullptr);
             dlog(DLOG_LEVEL_INFO, "Precharge-phase started");
         }
         exi_out->V2G_Message.Body.PreChargeRes_isUsed = 1u;

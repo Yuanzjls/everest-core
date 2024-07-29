@@ -10,6 +10,9 @@ types:
       - Export
       - Import
       - Fault
+      - CableCheck
+      - PreCharge
+      - Charging
   VoltageCurrent:
     description: Voltage (V) and Current (A) at the input/output of the power supply
     type: object

@@ -224,10 +224,19 @@ void EvseManager::ready() {
             r_hlc[0]->call_update_dc_present_values(present_values);
 
             // Cable check for DC charging
-            r_hlc[0]->subscribe_Start_CableCheck([this] { cable_check(); });
+            r_hlc[0]->subscribe_Start_CableCheck([this] { 
+                r_powersupply_DC[0]->call_setMode(types::power_supply_DC::Mode::CableCheck);
+                cable_check(); 
+            });
+
+            // Precharge for DC charging
+            r_hlc[0]->subscribe_Start_PreCharge([this] { 
+                r_powersupply_DC[0]->call_setMode(types::power_supply_DC::Mode::PreCharge);
+            });
 
             // Notification that current demand has started
             r_hlc[0]->subscribe_currentDemand_Started([this] {
+                r_powersupply_DC[0]->call_setMode(types::power_supply_DC::Mode::Charging);
                 charger->notify_currentdemand_started();
                 current_demand_active = true;
             });
